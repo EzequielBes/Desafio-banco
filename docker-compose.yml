@@ -1,0 +1,47 @@
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres_container
+    environment:
+      POSTGRES_DB: todo
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    networks:
+      - todo-rede
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  todo:
+    image: todo  
+    container_name: todo_api
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_NAME: todo
+      SECRET_KEY: ffrrttsfawqfvxzccdzzd
+    networks:
+      - todo-rede
+  rabbitmq:
+    image: heidiks/rabbitmq-delayed-message-exchange:latest
+    container_name: rabbitmq_container
+    ports:
+      - "5672:5672"  
+      - "15672:15672"  
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_delayed_message_exchange &&
+             rabbitmq-server"
+    networks:
+      - todo-rede
+
+volumes:
+  pgdata:
+
+networks:
+  todo-rede:
+    driver: bridge
