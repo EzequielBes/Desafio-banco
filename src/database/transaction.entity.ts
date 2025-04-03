@@ -14,7 +14,7 @@ export class TransactionEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column({ default: "pendente" })
+  @Column({ default: "pending" })
   status: string;
 
   

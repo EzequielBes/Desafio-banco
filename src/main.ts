@@ -3,14 +3,17 @@ import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { Interceptor } from "./interceptor";
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-
+  const interceptor = app.get(Interceptor)
+  app.useGlobalInterceptors(interceptor);
+    
   app.useGlobalPipes(new ValidationPipe());
   const swaggerConfig = new DocumentBuilder()
-  .setTitle('API TODO')
+  .setTitle('API BANCO')
   .setDescription('')
   .addBearerAuth()
   .setVersion('0.0.1')

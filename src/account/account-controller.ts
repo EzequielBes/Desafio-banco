@@ -6,6 +6,7 @@ import { UpdateAccountInput } from "./dto/update-account-input";
 import { SigninAccountDto } from "./dto/signin-account-input";
 import { Signintype } from "./types/signin.type";
 import { Body, Controller, Delete, Headers, Post, Put } from "@nestjs/common/decorators";
+import { DeleteAccountDTO } from "./dto/delete_account.input";
 
 
 @Controller("account")
@@ -29,15 +30,13 @@ export class AccountController {
   }
 
   @Put("update")
-  async update(@Body() body: UpdateAccountInput, @Headers() token: any): Promise<void> {
-    const idToken = token.authorization;
-    await this.accountService.update(body, idToken);
+  async update(@Body() body: UpdateAccountInput): Promise<void> {
+    await this.accountService.update(body);
   }
 
  
   @Delete("delete")
-  async delete(@Headers() token: any): Promise<void> {
-    const idToken = token.authorization;
-    await this.accountService.delete(idToken);
+  async delete(@Body() body: DeleteAccountDTO): Promise<void> {
+    await this.accountService.delete(body.id);
   }
 }

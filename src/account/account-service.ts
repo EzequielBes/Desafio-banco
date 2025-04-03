@@ -7,6 +7,7 @@ import { UpdateAccountInput } from "./dto/update-account-input";
 import { Signintype } from "./types/signin.type";
 import { Injectable } from "@nestjs/common/decorators";
 import { HttpException, UnauthorizedException } from "@nestjs/common/exceptions";
+import { ACCOUNT_EXISTS, USER_INVALID, USER_NOT_FOUNDED } from "@/constants";
 
 @Injectable()
 export class AccountService {
@@ -17,7 +18,7 @@ export class AccountService {
 
   async create(input: CreateAccountInput): Promise<void> {
     const accountExists = await this.accountRepository.findByEmail(input.email);
-    if (accountExists) throw new HttpException("Ja existe uma conta com esse email", 402);
+    if (accountExists) throw new HttpException(ACCOUNT_EXISTS.message, ACCOUNT_EXISTS.statusCode);
     const account = Account.create(input.email, input.password, input.username);
     await this.accountRepository.create(account);
   }
@@ -32,7 +33,7 @@ export class AccountService {
       account.username,
     );
     if (input.password != getAccount.password)
-      throw new HttpException("Usuario ou senha invalidos", 401);
+      throw new HttpException(USER_INVALID.message, USER_INVALID.statusCode);
     const payload = {
       userEmail: account.email,
       account_id: account.account_id,
@@ -43,7 +44,7 @@ export class AccountService {
 
   async findOne(email: string) {
     const account = await this.accountRepository.findByEmail(email);
-    if (!account) throw new HttpException("Conta não foi encontrada", 404);
+    if (!account) throw new HttpException(USER_NOT_FOUNDED.message, USER_NOT_FOUNDED.statusCode);
     return Account.restore(
       account.account_id,
       account.email,
@@ -52,18 +53,16 @@ export class AccountService {
     );
   }
 
-  async update(input: UpdateAccountInput, headerToken: string) {
-    const extractedId = await this.auth.decoded(headerToken);
-    const findAcc = await this.accountRepository.findById(extractedId);
-    if(!findAcc) throw new HttpException("Conta não foi encontrada", 404);
-    const updatedAccount = {account_id: extractedId, email: input.email, username: input.username, password: input.password }
+  async update(input: UpdateAccountInput) {
+    const findAcc = await this.accountRepository.findById(input.id);
+    if(!findAcc) throw new HttpException(USER_NOT_FOUNDED.message, USER_NOT_FOUNDED.statusCode);
+    const updatedAccount = {account_id: input.id, email: input.email, username: input.username, password: input.password }
     await this.accountRepository.update(updatedAccount)
     return 
   }
-  async delete (token:string) {
-    const id = await this.auth.decoded(token);
+  async delete (id:string) {
     const account = await this.accountRepository.findById(id);
-    if(!account) throw new HttpException("Conta não foi encontrada", 404);
+    if(!account) throw new HttpException(USER_NOT_FOUNDED.message, USER_NOT_FOUNDED.statusCode);
     await this.accountRepository.delete(account.account_id);
     return 
   }

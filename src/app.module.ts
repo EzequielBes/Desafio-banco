@@ -1,3 +1,5 @@
+import { AuthService } from './auth/auth.service';
+import { Interceptor } from './interceptor';
 import { forwardRef, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import typeormConfig from "./database/typeorm.config";
@@ -11,12 +13,12 @@ import { AuthGuard } from "./auth/auth.guard";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { RabbitMQModule } from '@bgaldino/nestjs-rabbitmq';
 import { RabbitOptions } from "./rabbitmq.config";
-import { TransactionConsumer } from "./transaction/transaction-consumer";
+import { ConsumerModule } from './consumer/consumer.module';
 
 
 @Module({
   imports: [
-    RabbitMQModule.register({ useClass: RabbitOptions, injects: [TransactionConsumer] }),
+    RabbitMQModule.register({ useClass: RabbitOptions, injects: [ConsumerModule] }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeormConfig],
@@ -29,8 +31,11 @@ import { TransactionConsumer } from "./transaction/transaction-consumer";
   ],
   providers: [
     { provide: APP_GUARD,
-       useClass: AuthGuard,}
+       useClass: AuthGuard,},
+       Interceptor,
+       AuthService
  ],
+   
 
 })
 export class AppModule {}

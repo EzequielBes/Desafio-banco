@@ -14,10 +14,11 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
 
     async findAllTransaction(owner_id: string): Promise<Transaction[] | null> {
        const transactions = await this.repository.find({
-        where: {
-            sender_id: owner_id,
-            receiver_id: owner_id
-        }
+        where: [
+           {sender_id: owner_id},
+            {receiver_id: owner_id}
+        ],
+
        })
        if(!transactions) return null;
         const transactionsMap = transactions.map((values)=> {
@@ -28,8 +29,6 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
             values.status,
             values.amount,
             values.created_at,
-            values.sender.username,
-            values.receiver.username,
         )
    })
         return transactionsMap
@@ -51,14 +50,13 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
             transaction.status,
             transaction.amount,
             transaction.created_at,
-            transaction.sender.username,
-            transaction.receiver.username,
+       
         )
     }
 
     async create(transaction: Transaction): Promise<void> {
         try {
-            const create = await this.repository.create({
+            const transactionToBeCreated = this.repository.create({
                 id: transaction.transaction_id,
                 receiver_id: transaction.receive_id,
                 sender_id: transaction.sender_id,
@@ -67,18 +65,17 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
                 created_at: transaction.created_At,
                 updated_at: new Date()
             }) 
-            console.log(create)
+            await this.repository.save(transactionToBeCreated)
         } catch (err) {
             console.log("erro", err)
         }
 
     }
 
-    async update(updatedTransaction: Transaction): Promise<void> {
-        const update = await this.repository.update(updatedTransaction.transaction_id, {
-            status: updatedTransaction.status
-        })
-    
+    async update(transaction: Transaction, status: string): Promise<void> {
+        console.log("teste");
+        await this.repository.update(transaction.transaction_id, { status });
     }
+    
 
 }

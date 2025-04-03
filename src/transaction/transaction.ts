@@ -10,16 +10,14 @@ export class Transaction {
         readonly status: string,
         readonly amount : number,
         readonly created_At: Date,
-        readonly sender: string | null,
-        readonly receiver: string | null
     ) {}
 
     static create (sender_id:string, receive_id:string, amount:number, status?:string | null) {
         const id = randomUUID()
-        return new Transaction(id, sender_id, receive_id, status , amount, new Date(), null, null)
+        return new Transaction(id, sender_id, receive_id, status , amount, new Date())
     }
 
-    static restore (transaction_id:string, sender_id:string, receive_id:string,status:string, amount: number, created_at:Date, sender:string, receiver:string) {
-        return new Transaction(transaction_id, sender_id, receive_id, status, amount, created_at, sender, receiver)
+    static restore (transaction_id:string, sender_id:string, receive_id:string,status:string, amount: number, created_at:Date) {
+        return new Transaction(transaction_id, sender_id, receive_id, status, amount, created_at)
     }
 }

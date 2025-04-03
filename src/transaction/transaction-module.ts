@@ -8,7 +8,7 @@ import { DatabaseModule } from '@/database/database.module';
 import { TransactionRepository } from './transaction.repository';
 import { TransactionRepositoryTypeorm } from '@/database/transaction-repository-typeorm';
 import { AccountModule } from '@/account/account.module';
-import { TransactionConsumer } from './transaction-consumer';
+
 
 @Global()
 @Module({
@@ -16,11 +16,10 @@ import { TransactionConsumer } from './transaction-consumer';
   controllers: [TransactionController],
   providers: [
     TransactionService, 
-    TransactionConsumer,
     {
         provide:TransactionRepository,
         useClass:TransactionRepositoryTypeorm
     }],
-  exports: [TransactionConsumer],
+  exports: [TransactionRepository],
 })
 export class TransactionModule {}
