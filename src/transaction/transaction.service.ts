@@ -27,24 +27,23 @@ export class TransactionService {
         if(balance < body.amount) throw new HttpException(INSUFFICIENT_BALANCE.message, INSUFFICIENT_BALANCE.statusCode) ;
         await this.transactionRepository.create(create)
          const isPublish = await this.rabbitMQService.publish('transfer-exchange', 'transaction', create);  
-         if(isPublish) return {message: 'Transação enviada'}
+         if(isPublish) return {data: 'Transação enviada'}
         
     }
 
     async deposit (body: CreateTransactionDTO) {
         const receiver = await this.accountRepository.findById(body.receiver_id)
-        console.log("id do receiver", receiver)
         if(!receiver) throw new NotFoundException(``);
         const create = Transaction.create(body.owner_id, body.receiver_id, body.amount, "deposit")
         const save = await this.transactionRepository.create(create)
         const fila = await this.rabbitMQService.publish('transfer-exchange', 'transaction', create);
         if(fila == false) throw new HttpException("An error occurred while the deposit was being processed.", 500)
-        return `O deposito de ${body.amount.toFixed(2)} foi feito com sucesso`
+        return {data: `O deposito de ${body.amount.toFixed(2)} foi feito com sucesso`}
     }
 
     async viewBalance(owner_id: GetAmountDTO ) {
         const balance = await this.getAmount(owner_id.owner_id)
-        return {message: `Seu saldo atual é de R$ ${balance.toFixed(2)}`}
+        return {data: `Seu saldo atual é de R$ ${balance.toFixed(2)}`}
     }
 
 
@@ -94,7 +93,7 @@ export class TransactionService {
         } else {
             throw new HttpException(REFOUND_LIMIT.message, REFOUND_LIMIT.statusCode);
         }
-        return "Reembolso realizado com sucesso"
+        return {data: "Reembolso realizado com sucesso"}
     }
 
 
@@ -109,7 +108,7 @@ export class TransactionService {
             acc[key].push(obj)
             return acc
         }, {})
-        return formated
+        return {data: formated}
     }
     
 }

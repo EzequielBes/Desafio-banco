@@ -6,4 +6,5 @@ export abstract class AccountRepository {
   abstract create(account: Account): Promise<void>;
   abstract update(updatedAccount: Account):Promise<void>
   abstract delete(account_id:string):Promise<void>
+  abstract findAll():Promise<Account[] | null>
 }

@@ -8,18 +8,21 @@ import { Signintype } from "./types/signin.type";
 import { Injectable } from "@nestjs/common/decorators";
 import { HttpException, UnauthorizedException } from "@nestjs/common/exceptions";
 import { ACCOUNT_EXISTS, USER_INVALID, USER_NOT_FOUNDED } from "@/constants";
+import { PasswordService } from "./security/password.service";
 
 @Injectable()
 export class AccountService {
   constructor(
     private accountRepository: AccountRepository,
     private auth: AuthService,
+    private passwordService: PasswordService
   ) {}
 
   async create(input: CreateAccountInput): Promise<void> {
     const accountExists = await this.accountRepository.findByEmail(input.email);
     if (accountExists) throw new HttpException(ACCOUNT_EXISTS.message, ACCOUNT_EXISTS.statusCode);
-    const account = Account.create(input.email, input.password, input.username);
+    const hashpassword = await this.passwordService.hashPassword(input.password)
+    const account = Account.create(input.email, hashpassword, input.username);
     await this.accountRepository.create(account);
   }
 
@@ -32,8 +35,8 @@ export class AccountService {
       account.password,
       account.username,
     );
-    if (input.password != getAccount.password)
-      throw new HttpException(USER_INVALID.message, USER_INVALID.statusCode);
+    const validPassword = await this.passwordService.comparePasswords(input.password, getAccount.password)
+    if (!validPassword) throw new HttpException(USER_INVALID.message, USER_INVALID.statusCode);
     const payload = {
       userEmail: account.email,
       account_id: account.account_id,
@@ -66,4 +69,20 @@ export class AccountService {
     await this.accountRepository.delete(account.account_id);
     return 
   }
+
+  async listAccountsId() {
+    const accounts = await this.accountRepository.findAll();
+    
+    if (!accounts || accounts.length === 0) {
+        return [];
+    }
+
+    const accountIds = accounts.map((item) => ({
+        name: item.username,
+        account_id: item.account_id
+    }));
+
+    console.log(accountIds);
+    return accountIds;
+}
 }

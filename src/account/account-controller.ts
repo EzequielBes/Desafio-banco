@@ -5,11 +5,12 @@ import { Public } from "src/auth/constants";
 import { UpdateAccountInput } from "./dto/update-account-input";
 import { SigninAccountDto } from "./dto/signin-account-input";
 import { Signintype } from "./types/signin.type";
-import { Body, Controller, Delete, Headers, Post, Put } from "@nestjs/common/decorators";
+import { Body, Controller, Delete, Get, Headers, Post, Put } from "@nestjs/common/decorators";
 import { DeleteAccountDTO } from "./dto/delete_account.input";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotAcceptableResponse, ApiNotFoundResponse, ApiOperation, ApiResponse, ApiSecurity, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse } from "@nestjs/swagger";
 import { ACCOUNT_EXISTS, USER_INVALID } from "@/constants";
 import { ErrorResponseDto } from "@/swaggerResponses/swaggerDTO";
+import { ListAccountResponse } from "./dto/listAccount-response";
 
 
 @Controller("account")
@@ -54,6 +55,13 @@ export class AccountController {
   @Put("update")
   async update(@Body() body: UpdateAccountInput): Promise<void> {
     await this.accountService.update(body);
+  }
+
+  @ApiResponse({status:200, description: "lista usuarios", isArray:true, type:ListAccountResponse })
+  @ApiBearerAuth()
+  @Get("listAccounts")
+  async listAccount(){
+    return await this.accountService.listAccountsId()
   }
 
  @ApiOperation({

@@ -13,6 +13,19 @@ export class AccountRepositoryTypeorm implements AccountRepository {
   constructor(private readonly dataSource: DataSource) {
     this.repository = this.dataSource.getRepository(AccountEntity);
   }
+    async findAll(): Promise<Account[] | null> {
+        const users = await this.repository.find({})
+        if(!users) return null
+        const usersMap = users.map((acc) => {
+            return Account.restore(
+                acc.id,
+                acc.email,
+                acc.password,
+                acc.username
+            )
+        })
+        return usersMap
+    }
     
 
   async findByEmail(email: string): Promise<Account> {
