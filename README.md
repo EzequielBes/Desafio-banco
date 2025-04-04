@@ -23,7 +23,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=admin
 DB_PASSWORD=admin
-DB_NAME=banco
+DB_NAME=bancoapi_db
 
 SECRET_KEY="secretkey"
 ```
