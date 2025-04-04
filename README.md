@@ -118,7 +118,7 @@ Este projeto foi desenvolvido para demonstrar habilidades com:
 | -------- | -------- | ------------------- |
 | `GET`    | `/transactions/listTransactions`      | *Rota para listar transação ja feitas* |
 | `POST`   | `/transactions/deposit`      | *Depositar saldo na propria conta sem limites, propositalmente criado para simular mais de um tipo de transacao* |
-| `POST`    | `/transactions/refound`      | *Transferir um valor para um outro usuario* |
+| `POST`    | `/transactions/create`      | *Transferir um valor para um outro usuario* |
 | `POST` | `/transactions/refound`      | *Pedir reembolso para transação pending ou success que nao passaram do prazo de 1 dia.* |
 
 ![alt text](image-1.png)
