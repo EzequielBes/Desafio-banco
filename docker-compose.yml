@@ -1,35 +1,36 @@
-
 services:
-  postgres:
+  bancoapi_postgres:
     image: postgres
-    container_name: postgres_container
+    container_name: bancoapi_postgres_container
     environment:
-      POSTGRES_DB: banco
+      POSTGRES_DB: bancoapi_db
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     networks:
-      - banco-rede
+      - bancoapi-rede
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-  banco:
-    image: banco  
-    container_name: banco_api
+      - bancoapi_pgdata:/var/lib/postgresql/data
+
+  bancoapi_api:
+    image: bancoapi_api
+    container_name: bancoapi_api_container
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: postgres
+      DB_HOST: bancoapi_postgres
       DB_PORT: 5432
       DB_USER: admin
       DB_PASSWORD: admin
-      DB_NAME: banco
+      DB_NAME: bancoapi_db
       SECRET_KEY: ffrrttsfawqfvxzccdzzd
     networks:
-      - banco-rede
-  rabbitmq:
+      - bancoapi-rede
+
+  bancoapi_rabbitmq:
     image: heidiks/rabbitmq-delayed-message-exchange:latest
-    container_name: rabbitmq_container
+    container_name: bancoapi_rabbitmq_container
     ports:
       - "5672:5672"  
       - "15672:15672"  
@@ -37,11 +38,11 @@ services:
       sh -c "rabbitmq-plugins enable --offline rabbitmq_delayed_message_exchange &&
              rabbitmq-server"
     networks:
-      - banco-rede
+      - bancoapi-rede
 
 volumes:
-  pgdata:
+  bancoapi_pgdata:
 
 networks:
-  banco-rede:
+  bancoapi-rede:
     driver: bridge
