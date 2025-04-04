@@ -5,8 +5,9 @@ import { AccountRepository } from "@/account/account-respository";
 import { TransactionRepository } from "./transaction.repository";
 import { RabbitMQService } from "@bgaldino/nestjs-rabbitmq";
 import { GetAmountDTO } from "./dto/getAmount";
-import { ALREADY_REFOUND, INSUFFICIENT_BALANCE, Receiver_NOT_FOUND, REFOUND_LIMIT } from "@/constants";
+import { ALREADY_REFOUND, INSUFFICIENT_BALANCE, Receiver_NOT_FOUND, REFOUND_LIMIT, TRANSACTION_NOT_FOUNDED } from "@/constants";
 import { RefoundTransactionDto } from "./dto/refoundTransactionDTO";
+import { CustomLogger } from "@/utils/custom.logger";
 
 
 @Injectable()
@@ -15,7 +16,8 @@ export class TransactionService {
     constructor (
         private readonly rabbitMQService: RabbitMQService,
         private readonly accountRepository: AccountRepository,
-        private readonly transactionRepository : TransactionRepository
+        private readonly transactionRepository : TransactionRepository,
+        private readonly logger: CustomLogger
     ) {}
 
     async create (body: CreateTransactionDTO) {
@@ -27,7 +29,8 @@ export class TransactionService {
         if(balance < body.amount) throw new HttpException(INSUFFICIENT_BALANCE.message, INSUFFICIENT_BALANCE.statusCode) ;
         await this.transactionRepository.create(create)
          const isPublish = await this.rabbitMQService.publish('transfer-exchange', 'transaction', create);  
-         if(isPublish) return {data: 'Transação enviada'}
+         if(!isPublish)  {this.logger.error('Failed to publish transaction to RabbitMQ', 'TransactionService'); throw new HttpException("An error occurred while the deposit was being processed.", 500)};
+         return {data: 'Transação enviada'}
         
     }
 
@@ -35,9 +38,9 @@ export class TransactionService {
         const receiver = await this.accountRepository.findById(body.receiver_id)
         if(!receiver) throw new NotFoundException(``);
         const create = Transaction.create(body.owner_id, body.receiver_id, body.amount, "deposit")
-        const save = await this.transactionRepository.create(create)
-        const fila = await this.rabbitMQService.publish('transfer-exchange', 'transaction', create);
-        if(fila == false) throw new HttpException("An error occurred while the deposit was being processed.", 500)
+        await this.transactionRepository.create(create)
+        const isPublish = await this.rabbitMQService.publish('transfer-exchange', 'transaction', create);
+        if(!isPublish) {this.logger.error('Failed to publish transaction to RabbitMQ', 'TransactionService'); throw new HttpException("An error occurred while the deposit was being processed.", 500)}
         return {data: `O deposito de ${body.amount.toFixed(2)} foi feito com sucesso`}
     }
 
@@ -82,6 +85,7 @@ export class TransactionService {
 
     async refoundTransaction (owner_id:string, transaction_id:string) {
         const findTransaction = await this.transactionRepository.findTransactionById(transaction_id)
+        if(!findTransaction) throw new NotFoundException(TRANSACTION_NOT_FOUNDED.message)
         if(findTransaction.status == "refunded") throw new HttpException(ALREADY_REFOUND.message, ALREADY_REFOUND.statusCode);
         let status = findTransaction.status
         let maxRefoundDays = 1
@@ -99,7 +103,6 @@ export class TransactionService {
 
     async listAllTransactions (owner_id:string) {
         const list = await this.transactionRepository.findAllTransaction(owner_id)
-
         const formated = list.reduce((acc, obj) => {
             let key = obj['status']
             if(!acc[key]) {

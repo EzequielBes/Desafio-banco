@@ -10,6 +10,11 @@ export const USER_NOT_FOUNDED: HttpError = {
     statusCode: 404
 }
 
+export const TRANSACTION_NOT_FOUNDED: HttpError = {
+    message: "No transactions founded with this id",
+    statusCode: 404
+}
+
 export const UNAUTHORIZED: HttpError = {
     message: "You must be logged in to make a request",
     statusCode: 401

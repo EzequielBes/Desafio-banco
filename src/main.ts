@@ -4,13 +4,14 @@ import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { Interceptor } from "./interceptor";
+import { CustomLogger } from "./utils/custom.logger";
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const interceptor = app.get(Interceptor)
   app.useGlobalInterceptors(interceptor);
-    
+    app.useLogger(app.get(CustomLogger))
   app.useGlobalPipes(new ValidationPipe());
   const swaggerConfig = new DocumentBuilder()
   .setTitle('API BANCO')
