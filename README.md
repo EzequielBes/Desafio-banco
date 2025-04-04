@@ -1,6 +1,6 @@
-# Projeto TODO API
+# Projeto Banco API
 
-Este projeto é uma API desenvolvida utilizando o framework **NestJS**, que implementa uma aplicação para gerenciamento de tarefas (**TODO**). A API utiliza autenticação JWT para proteger os endpoints e está documentada com **Swagger** para facilitar a interação e compreensão.
+Este projeto é uma API desenvolvida utilizando o framework **NestJS**, que implementa uma aplicação para gerenciamento de tarefas (**Banco**). A API utiliza autenticação JWT para proteger os endpoints e está documentada com **Swagger** para facilitar a interação e compreensão.
 
 ---
 
@@ -22,7 +22,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=admin
 DB_PASSWORD=admin
-DB_NAME=todo
+DB_NAME=banco
 
 SECRET_KEY="secretkey"
 
@@ -36,7 +36,7 @@ npm run build
 
 Para construir a imagem Docker sem utilizar cache, execute:
 
-docker build --no-cache  -t todo  .
+docker build --no-cache  -t banco  .
 
 Após a construção, suba os serviços com o Docker Compose:
 
@@ -86,5 +86,6 @@ Este projeto foi desenvolvido para demonstrar habilidades com:
     Implementação de Autenticação JWT.
     Configuração de um ambiente completo usando Docker.
     Documentação clara e interativa com Swagger.
+    Gerenciamento de filas com RABBITMQ
 ```
-![image](https://github.com/user-attachments/assets/853a4a2f-76cc-4ad2-b143-7dcbe4eeeebc)
+
