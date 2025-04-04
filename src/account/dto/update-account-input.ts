@@ -6,16 +6,17 @@ export class UpdateAccountInput {
   @IsString()
   id: string
 
+  @ApiProperty()
   @IsOptional() 
   @IsEmail() 
   email?: string;
 
-  
+  @ApiProperty()
   @IsOptional()
   @IsString()
   username?: string;
 
- 
+  @ApiProperty()
   @IsOptional()
   @IsStrongPassword()
   password?: string;

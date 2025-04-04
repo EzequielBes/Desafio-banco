@@ -1,37 +1,46 @@
+import { ApiProperty } from "@nestjs/swagger"
+
 export type HttpError = {
     message: string,
     statusCode: number
 }
 
-
-export const USER_NOT_FOUNDED:HttpError = {
-    message:"no user found with that email address",
-    statusCode:404
+export const USER_NOT_FOUNDED: HttpError = {
+    message: "No user found with this email address",
+    statusCode: 404
 }
 
-export const INSUFFICIENT_BALANCE:HttpError = {
-    message: "Insufficient transfer balance",
+export const UNAUTHORIZED: HttpError = {
+    message: "You must be logged in to make a request",
+    statusCode: 401
+}
+
+export const INSUFFICIENT_BALANCE: HttpError = {
+    message: "Insufficient balance for the transfer",
     statusCode: 422
 }
 
-export const Receiver_NOT_FOUND:HttpError = {
-    message: "User informed for transaction not found",
+export const Receiver_NOT_FOUND: HttpError = {
+    message: "The user specified for the transaction was not found",
     statusCode: 404
 }
 
 export const USER_INVALID: HttpError = {
-    message: "INVALID USERNAME OR PASSWORD",
-    statusCode: 402
+    message: "Invalid username or password",
+    statusCode: 401
 }
 
 export const ACCOUNT_EXISTS: HttpError = {
-    message: "AN ACCOUNT WITH THIS EMAIL ALREADY EXISTS",
+    message: "An account with this email already exists",
+    statusCode: 409
+}
+
+export const ALREADY_REFOUND: HttpError = {
+    message: "The transaction has already been refunded",
     statusCode: 402
 }
 
-                
-// -> logar -> token  id -> id outra = saldo
-// -> logar -> token -> id outra -> id
-
-// --> login -> token => fazer transacao -> sender_id , receiver_id amount 
-// --> login -> token => fazer transacao -> receiver, sender amount 
+export const REFOUND_LIMIT: HttpError = {
+    message: "The time limit for requesting a refund has expired",
+    statusCode: 402
+}

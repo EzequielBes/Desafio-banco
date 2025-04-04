@@ -21,13 +21,13 @@ export class TransactionConsumer implements IRabbitConsumer {
     content: Transaction,
     parameters?: RabbitConsumerParameters,
   ): Promise<void> {
-    let status = content.status == 'deposit' ? 'deposit' : 'success'
+    let status = content.status === "deposit" ? "deposit" : content.status == "refunded" ? "refunded": "success"
 
    if(parameters.message.fields.deliveryTag === 5){
     await this.rabbitMQService.publish('transfer-exchange', 'reversal.transaction', content)
     return
    }
-   await this.transactionsRepository.update(content, status);
+   const updateStatus = await this.transactionsRepository.update(content, status);
     
 }
 }

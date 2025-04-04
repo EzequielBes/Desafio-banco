@@ -29,6 +29,7 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
             values.status,
             values.amount,
             values.created_at,
+            values.updated_at
         )
    })
         return transactionsMap
@@ -50,6 +51,7 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
             transaction.status,
             transaction.amount,
             transaction.created_at,
+            transaction.updated_at
        
         )
     }
@@ -62,19 +64,26 @@ export class TransactionRepositoryTypeorm implements TransactionRepository {
                 sender_id: transaction.sender_id,
                 amount: transaction.amount,
                 status: transaction.status,
-                created_at: transaction.created_At,
+                created_at: transaction.created_at,
                 updated_at: new Date()
             }) 
             await this.repository.save(transactionToBeCreated)
-        } catch (err) {
-            console.log("erro", err)
+        } catch (err:any) {
+            console.log({message: err.message})
         }
 
     }
 
     async update(transaction: Transaction, status: string): Promise<void> {
-        console.log("teste");
-        await this.repository.update(transaction.transaction_id, { status });
+        try {
+            await this.repository.update(transaction.transaction_id, {
+                status: status,
+                updated_at: new Date()
+            });
+        } catch (err: any) {
+            console.log({message: err.message})
+        }
+
     }
     
 
