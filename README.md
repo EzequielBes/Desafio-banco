@@ -36,7 +36,7 @@ npm run build
 
 Para construir a imagem Docker sem utilizar cache, execute:
 
-docker build --no-cache  -t banco  .
+docker build --no-cache  -t bancoapi_api .
 
 Após a construção, suba os serviços com o Docker Compose:
 
